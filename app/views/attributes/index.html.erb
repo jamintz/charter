@@ -1,8 +1,8 @@
-<% Bin.distinct.pluck(:name).each do |name|%>
-<h3><%="#{name.capitalize} Binned Distribution"%></h3>
-<%= column_chart Bin.where(name:name).group(:bin).sum(:freq).sort_by{|k,v|k} %>
+<% Bin.distinct([:name,:connector]).pluck(:name,:connector).each do |name,connector|%>
+<h3><%="#{name.capitalize} (#{connector.capitalize} Binned Distribution"%></h3>
+<%= column_chart Bin.where(name:name,connector:connector).group(:bin).sum(:freq).sort_by{|k,v|k} %>
 <% end %>
-<% Factor.distinct.pluck(:name).each do |name|%>
-<h3><%="#{name.capitalize} Factored Distribution"%></h3>
-<%= column_chart Factor.where(name:name).group(:level).sum(:freq).sort_by{|k,v|k} %>
+<% Factor.distinct([:name,:connector]).pluck(:name,:connector).each do |name,connector|%>
+<h3><%="#{name.capitalize} (#{connector.capitalize} Factored Distribution"%></h3>
+<%= column_chart Factor.where(name:name,connector:connector).group(:level).sum(:freq).sort_by{|k,v|k} %>
 <% end %>

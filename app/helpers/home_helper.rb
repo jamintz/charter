@@ -43,35 +43,63 @@ module HomeHelper
       i+=1
     end
     
-    Attribute.distinct.pluck(:name).each do |name|
-      ats = Attribute.where(name:name)
-      res = ats.map{|x|eval(x.result)}
+    Attribute.distinct([:name,:connector]).pluck(:name,:connector).each do |name,connector|
+      ats = Attribute.where(name:name,connector:connector)
+      sel = ats.order("RANDOM()").limit(100000)
+      res = sel.map(&:result)
       uni = res.uniq
       uni.reject!{|x|x.nil? || x == 'unknown' || x == '[FILTERED]'}
       if uni.map{|x|is_num(x)}.uniq == [true] && uni.count > 10
         bins, freqs = res.reduce([]){|a,x|a.push(x.to_f) unless x.nil? || x == 'unknown' || x == '[FILTERED]';a}.histogram(10)
-        tot = freqs.sum
-        Array(0..9).each do |i|
-          Bin.create(
-          bin:bins[i],
-          freq:(freqs[i]/(tot*1.0)).round(2),
-          name:name.to_f.round(2))
+        sel.group_by{|x|x.time.strftime('%m-%Y')}.each do |month,as|
+          as.group_by{|x|x.time.strftime('%U')}.each do |week, as2|
+            b2, f2 = as2.map(&:result).reduce([]){|a,x|a.push(x.to_f) unless x.nil? || x == 'unknown' || x == '[FILTERED]';a}.histogram(bins)
+            tot = f2.sum
+            Array(0..9).each do |i|
+              Bin.create(
+              bin:b2[i].to_f.round(2),
+              freq:(f2[i]/(tot*1.0)).round(2),
+              name:name,
+              connector:connector,
+              week:wk,
+              month:month)
+            end
+          end
         end
       else
         h = Hash.new(0)
         res.each{|x|h[x]+=1}
         cap = res.count / 25.0
         keep,oth = h.partition{|k,v|v >= cap}
-        tot = h.values.sum
-        keep.each do |k,v|
-          Factor.create(
-          name:name,
-          level:k,
-          freq:(v/(tot*1.0)).round(2))
+        sel.group_by{|x|x.time.strftime('%m-%Y')}.each do |month,as|
+          as.group_by{|x|x.time.strftime('%U')}.each do |week, as2|
+            vals = as2.map(&:result)
+            h = Hash.new(0)
+            keep.keys.each do |k|
+              h[k] = as2.where(result:k).count
+            end
+            h['other'] = as2.count - h.values.sum
+            tot = h.values.sum
+            h.each do |k,v|
+              Factor.create(
+              name:name,
+              level:k,
+              freq:(v/(tot*1.0)).round(2),
+              connector:connector,
+              week:week,
+              month:month)
+            end
+            Factor.create(name:name,
+            connector:connector,
+            level:'other',
+            freq:(oth.map(&:last).sum/(tot*1.0)).round(2),
+            week:week,
+            month:month) unless oth.empty?
+          end
         end
-        Factor.create(name:name,level:'other',freq:(oth.map(&:last).sum/(tot*1.0)).round(2)) unless oth.empty?
-      end  
-    end  
+      end
+    end
+
   end
   
   #input = select * from transactions where...
