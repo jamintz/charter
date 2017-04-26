@@ -63,7 +63,7 @@ module HomeHelper
           h['other'] = as2.count - h.values.sum unless oth.empty?
           tot = h.values.sum
           h.each do |k,v|
-            Factor.create(
+            Factor.find_or_create_by(
             name:name,
             level:k,
             freq:(v/(tot*1.0)).round(2),
@@ -82,7 +82,7 @@ module HomeHelper
             b2, f2 = as2.map(&:result).reduce([]){|a,x|a.push(x.to_f) unless x.nil? || x == 'unknown' || x == '[FILTERED]';a}.histogram(bins)
             tot = f2.sum
             Array(0..9).each do |i|
-              Bin.create(
+              Bin.find_or_create_by(
               bin:b2[i].to_f.round(2),
               freq:(f2[i]/(tot*1.0)).round(2),
               name:name,
