@@ -1,0 +1,17 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  name: MyString
+  result: MyString
+  time: 2017-04-25 17:21:46
+  library: 1
+  exec_time: 1.5
+  connector: MyString
+
+two:
+  name: MyString
+  result: MyString
+  time: 2017-04-25 17:21:46
+  library: 1
+  exec_time: 1.5
+  connector: MyString

@@ -1,0 +1,15 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  library: 1
+  time: 2017-04-25 20:03:58
+  type: 
+  duration: 1.5
+  ip: MyString
+
+two:
+  library: 1
+  time: 2017-04-25 20:03:58
+  type: 
+  duration: 1.5
+  ip: MyString
