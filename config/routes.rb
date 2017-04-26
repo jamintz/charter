@@ -1,7 +1,9 @@
 Rails.application.routes.draw do
 
+  get 'connector/index'
+
   get 'transactions' => 'transactions#index'
-  get 'attributes' => 'attributes#index'
+  get 'connectors' => 'connectors#index'
   
 
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html

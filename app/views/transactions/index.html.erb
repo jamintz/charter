@@ -27,3 +27,33 @@
 <h3>Transactions by <%="#{cut.capitalize}"%> by Day of Month</h3>
 <%= line_chart Transaction.group(cut).group_by_day_of_month(:time).count %>
 <% end %>
+
+<h3>Execution Time by Month</h3>
+<%= line_chart Transaction.group_by_month(:time).average(:duration) %>
+<h3>Execution Time by Week</h3>
+<%= line_chart Transaction.group_by_week(:time).average(:duration) %>
+<h3>Execution Time by Day</h3>
+<%= line_chart Transaction.group_by_day(:time).average(:duration) %>
+<h3>Execution Time by Hour of Day</h3>
+<%= line_chart Transaction.group_by_hour_of_day(:time).average(:duration) %>
+<h3>Execution Time by Day of Week</h3>
+<%= line_chart Transaction.group_by_day_of_week(:time).average(:duration) %>
+<h3>Execution Time by Day of Month</h3>
+<%= line_chart Transaction.group_by_day_of_month(:time).average(:duration) %>
+
+<% [:ip, :status, :region, :apikey].each do |cut|%>
+<h3>Execution Time by <%="#{cut.capitalize}"%></h3>
+<%= bar_chart Transaction.group(cut).average(:duration) %>
+<h3>Execution Time by <%="#{cut.capitalize}"%> by Month</h3>
+<%= line_chart Transaction.group(cut).group_by_month(:time).average(:duration) %>
+<h3>Execution Time by <%="#{cut.capitalize}"%> by Week</h3>
+<%= line_chart Transaction.group(cut).group_by_week(:time).average(:duration) %>
+<h3>Execution Time by <%="#{cut.capitalize}"%> by Day</h3>
+<%= line_chart Transaction.group(cut).group_by_day(:time).average(:duration) %>
+<h3>Execution Time by <%="#{cut.capitalize}"%> by Hour of Day</h3>
+<%= line_chart Transaction.group(cut).group_by_hour_of_day(:time).average(:duration) %>
+<h3>Execution Time by <%="#{cut.capitalize}"%> by Day of Week</h3>
+<%= line_chart Transaction.group(:ip).group_by_day_of_week(:time).average(:duration) %>
+<h3>Execution Time by <%="#{cut.capitalize}"%> by Day of Month</h3>
+<%= line_chart Transaction.group(cut).group_by_day_of_month(:time).average(:duration) %>
+<% end %>
