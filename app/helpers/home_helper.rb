@@ -44,6 +44,7 @@ module HomeHelper
     end
     
     Attribute.distinct([:name,:connector]).pluck(:name,:connector).each do |name,connector|
+      puts "running #{name}"
       ats = Attribute.where(name:name,connector:connector)
       sel = ats.order("RANDOM()").limit(100000)
       res = sel.map(&:result)
@@ -56,10 +57,10 @@ module HomeHelper
         as.group_by{|x|x.time.strftime('%U')}.each do |week, as2|
           vals = as2.map(&:result)
           h = Hash.new(0)
-          keep.keys.each do |k|
-            h[k] = as2.where(result:k).count
+          keep.map(&:first).each do |k|
+            h[k] = as2.select{|x|x.result==k}.count
           end
-          h['other'] = as2.count - h.values.sum
+          h['other'] = as2.count - h.values.sum unless oth.empty?
           tot = h.values.sum
           h.each do |k,v|
             Factor.create(
@@ -70,12 +71,6 @@ module HomeHelper
             week:week,
             month:month)
           end
-          Factor.create(name:name,
-          connector:connector,
-          level:'other',
-          freq:(oth.map(&:last).sum/(tot*1.0)).round(2),
-          week:week,
-          month:month) unless oth.empty?
         end
       end
       uni = res.uniq
@@ -92,7 +87,7 @@ module HomeHelper
               freq:(f2[i]/(tot*1.0)).round(2),
               name:name,
               connector:connector,
-              week:wk,
+              week:week,
               month:month)
             end
           end
