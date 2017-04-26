@@ -13,7 +13,7 @@
 
 <% [:ip, :status, :region, :apikey].each do |cut|%>
 <h3>Transactions by <%="#{cut.capitalize}"%></h3>
-<%= bar_chart Transaction.group(cut).count %>
+<%= column_chart Transaction.group(cut).count %>
 <h3>Transactions by <%="#{cut.capitalize}"%> by Month</h3>
 <%= line_chart Transaction.group(cut).group_by_month(:time).count %>
 <h3>Transactions by <%="#{cut.capitalize}"%> by Week</h3>
@@ -43,7 +43,7 @@
 
 <% [:ip, :status, :region, :apikey].each do |cut|%>
 <h3>Execution Time by <%="#{cut.capitalize}"%></h3>
-<%= bar_chart Transaction.group(cut).average(:duration) %>
+<%= column_chart Transaction.group(cut).average(:duration) %>
 <h3>Execution Time by <%="#{cut.capitalize}"%> by Month</h3>
 <%= line_chart Transaction.group(cut).group_by_month(:time).average(:duration) %>
 <h3>Execution Time by <%="#{cut.capitalize}"%> by Week</h3>

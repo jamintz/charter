@@ -29,7 +29,7 @@ module HomeHelper
       else
         Attribute.create(
         name:row[name],
-        result:row[res],
+        result:eval(row[res]),
         time:row[time],
         library:row[lib],
         connector:row[connector],
@@ -45,32 +45,32 @@ module HomeHelper
     
     Attribute.distinct.pluck(:name).each do |name|
       ats = Attribute.where(name:name)
-      res = ats.map(&:result)
+      res = ats.map{|x|eval(x.result)}
       uni = res.uniq
       uni.reject!{|x|x.nil? || x == 'unknown' || x == '[FILTERED]'}
       if uni.map{|x|is_num(x)}.uniq == [true] && uni.count > 10
-        bins, freqs = res.reject!{|x|x.nil? || x == 'unknown' || x == '[FILTERED]'}.histogram(10)
+        bins, freqs = res.reduce([]){|a,x|a.push(x.to_f) unless x.nil? || x == 'unknown' || x == '[FILTERED]';a}.histogram(10)
+        tot = freqs.sum
         Array(0..9).each do |i|
           Bin.create(
           bin:bins[i],
-          freq:freqs[i],
-          name:name)
+          freq:(freqs[i]/(tot*1.0)).round(2),
+          name:name.to_f.round(2))
         end
       else
         h = Hash.new(0)
         res.each{|x|h[x]+=1}
-        cap = res.count / 20.0
+        cap = res.count / 25.0
         keep,oth = h.partition{|k,v|v >= cap}
+        tot = h.values.sum
         keep.each do |k,v|
           Factor.create(
           name:name,
           level:k,
-          freq:v)
+          freq:(v/(tot*1.0)).round(2))
         end
-        Factor.create(name:name,level:'other',freq:oth.map(&:last).sum) unless oth.empty?
-      end
-        
-        
+        Factor.create(name:name,level:'other',freq:(oth.map(&:last).sum/(tot*1.0)).round(2)) unless oth.empty?
+      end  
     end  
   end
   
