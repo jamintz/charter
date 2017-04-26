@@ -1,5 +1,7 @@
 require 'csv'
 module HomeHelper
+  
+  #input = select * from attributes where...
   def load_attrs 
     first = true
     i = 0
@@ -33,7 +35,7 @@ module HomeHelper
     end
   end
   
-  
+  #input = select * from transactions where...
   def load_trx
     first = true
     i = 0
@@ -42,6 +44,9 @@ module HomeHelper
     time=nil
     dur=nil
     ip=nil
+    status=nil
+    reg=nil
+    apikey=nil
     
     x = CSV.foreach('/users/jasonmintz/Desktop/trx.csv') do |row|
       puts i
@@ -51,6 +56,10 @@ module HomeHelper
         time = row.index('transaction_time')
         dur = row.index('transaction_duration')
         ip = row.index('ip_address')
+        status = row.index('status')
+        reg = row.index('aws_region')
+        apikey = row.index('api_key')
+        
         first = false
       else
         Transaction.create(kind:row[type],
@@ -58,6 +67,9 @@ module HomeHelper
         time:row[time],
         library:row[lib],
         duration:row[dur],
+        status:row[status],
+        region:row[reg],
+        apikey:row[apikey]
         )
       end
       i+=1

@@ -10,17 +10,20 @@
 <%= line_chart Transaction.group_by_day_of_week(:time).count %>
 <h3>Transactions by Day of Month</h3>
 <%= line_chart Transaction.group_by_day_of_month(:time).count %>
-<h3>Transactions by Ip</h3>
-<%= bar_chart Transaction.group(:ip).count %>
-<h3>Transactions by Ip by Month</h3>
-<%= line_chart Transaction.group(:ip).group_by_month(:time).count %>
-<h3>Transactions by Ip by Week</h3>
-<%= line_chart Transaction.group(:ip).group_by_week(:time).count %>
-<h3>Transactions by Ip by Day</h3>
-<%= line_chart Transaction.group(:ip).group_by_day(:time).count %>
-<h3>Transactions by Ip by Hour of Day</h3>
-<%= line_chart Transaction.group(:ip).group_by_hour_of_day(:time).count %>
-<h3>Transactions by Ip by Day of Week</h3>
+
+<% [:ip, :status, :region, :apikey].each do |cut|%>
+<h3>Transactions by <%="#{cut.capitalize}"%></h3>
+<%= bar_chart Transaction.group(cut).count %>
+<h3>Transactions by <%="#{cut.capitalize}"%> by Month</h3>
+<%= line_chart Transaction.group(cut).group_by_month(:time).count %>
+<h3>Transactions by <%="#{cut.capitalize}"%> by Week</h3>
+<%= line_chart Transaction.group(cut).group_by_week(:time).count %>
+<h3>Transactions by <%="#{cut.capitalize}"%> by Day</h3>
+<%= line_chart Transaction.group(cut).group_by_day(:time).count %>
+<h3>Transactions by <%="#{cut.capitalize}"%> by Hour of Day</h3>
+<%= line_chart Transaction.group(cut).group_by_hour_of_day(:time).count %>
+<h3>Transactions by <%="#{cut.capitalize}"%> by Day of Week</h3>
 <%= line_chart Transaction.group(:ip).group_by_day_of_week(:time).count %>
-<h3>Transactions by Ip by Day of Month</h3>
-<%= line_chart Transaction.group(:ip).group_by_day_of_month(:time).count %>
+<h3>Transactions by <%="#{cut.capitalize}"%> by Day of Month</h3>
+<%= line_chart Transaction.group(cut).group_by_day_of_month(:time).count %>
+<% end %>
