@@ -34,12 +34,12 @@ module HomeHelper
         library:row[lib],
         connector:row[connector],
         )
+        Connector.find_or_create_by(
+        name:row[connector],
+        exec_time:row[exec_time],
+        time:row[time],
+        library:row[lib])
       end
-      Connector.find_or_create_by(
-      name:row[connector],
-      exec_time:row[exec_time],
-      time:row[time],
-      library:row[lib])
       i+=1
     end
     
@@ -56,7 +56,21 @@ module HomeHelper
           freq:freqs[i],
           name:name)
         end
+      else
+        h = Hash.new(0)
+        res.each{|x|h[x]+=1}
+        cap = res.count / 20.0
+        keep,oth = h.partition{|k,v|v >= cap}
+        keep.each do |k,v|
+          Factor.create(
+          name:name,
+          level:k,
+          freq:v)
+        end
+        Factor.create(name:name,level:'other',freq:oth.map(&:last).sum) unless oth.empty?
       end
+        
+        
     end  
   end
   

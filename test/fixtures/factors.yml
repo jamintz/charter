@@ -1,0 +1,15 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  library: MyString
+  name: MyString
+  level: MyString
+  freq: 1.5
+  date: 2017-04-25 23:35:13
+
+two:
+  library: MyString
+  name: MyString
+  level: MyString
+  freq: 1.5
+  date: 2017-04-25 23:35:13
