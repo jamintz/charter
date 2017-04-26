@@ -1,8 +1,45 @@
 <% Bin.distinct([:name,:connector]).pluck(:name,:connector).each do |name,connector|%>
-<h3><%="#{name.capitalize} (#{connector.capitalize} Binned Distribution"%></h3>
-<%= column_chart Bin.where(name:name,connector:connector).group(:bin).sum(:freq).sort_by{|k,v|k} %>
+<h3><%="#{name.capitalize} (#{connector.capitalize}) Binned Distribution"%></h3>
+<%= column_chart Bin.where(name:name,connector:connector).group(:bin).sum(:freq).sort_by{|k,v|k.to_f} %>
 <% end %>
+
 <% Factor.distinct([:name,:connector]).pluck(:name,:connector).each do |name,connector|%>
-<h3><%="#{name.capitalize} (#{connector.capitalize} Factored Distribution"%></h3>
+<h3><%="#{name.capitalize} (#{connector.capitalize}) Factored Distribution"%></h3>
 <%= column_chart Factor.where(name:name,connector:connector).group(:level).sum(:freq).sort_by{|k,v|k} %>
+<% end %>
+
+<% Bin.distinct([:name,:connector]).pluck(:name,:connector).each do |name,connector|%>
+<h3><%="#{name.capitalize} (#{connector.capitalize}) Binned Distribution by Week"%></h3>
+<% h = []
+ Bin.where(name:name, connector:connector).distinct(:week).pluck(:week).each do |wk| 
+	 h << {name:"#{wk}",data:Bin.where(name:name,connector:connector,week:wk).group(:bin).average(:freq).sort_by{|k,v|k.to_f}}
+ end %>
+<%= column_chart h %>
+<% end %>
+
+<% Bin.distinct([:name,:connector]).pluck(:name,:connector).each do |name,connector|%>
+<h3><%="#{name.capitalize} (#{connector.capitalize}) Binned Distribution by Month"%></h3>
+<% h = []
+ Bin.where(name:name, connector:connector).distinct(:month).pluck(:month).each do |mnth| 
+	 h << {name:"#{mnth}",data:Bin.where(name:name,connector:connector,month:mnth).group(:bin).average(:freq).sort_by{|k,v|k.to_f}}
+ end %>
+<%= column_chart h %>
+<% end %>
+
+<% Factor.distinct([:name,:connector]).pluck(:name,:connector).each do |name,connector|%>
+<h3><%="#{name.capitalize} (#{connector.capitalize}) Factored Distribution by Week"%></h3>
+<% h = []
+ Factor.where(name:name, connector:connector).distinct(:week).pluck(:week).each do |wk| 
+	 h << {name:"#{wk}",data:Factor.where(name:name,connector:connector,week:wk).group(:level).average(:freq).sort_by{|k,v|k.to_f}}
+ end %>
+<%= column_chart h %>
+<% end %>
+
+<% Factor.distinct([:name,:connector]).pluck(:name,:connector).each do |name,connector|%>
+<h3><%="#{name.capitalize} (#{connector.capitalize}) Factored Distribution by Month"%></h3>
+<% h = []
+ Factor.where(name:name, connector:connector).distinct(:month).pluck(:month).each do |mnth| 
+	 h << {name:"#{mnth}",data:Factor.where(name:name,connector:connector,month:mnth).group(:level).average(:freq).sort_by{|k,v|k.to_f}}
+ end %>
+<%= column_chart h %>
 <% end %>

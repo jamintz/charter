@@ -8,17 +8,17 @@
 <%= line_chart Connector.group(:name).group_by_day(:time).count %>
 
 
-<h3>Connector Response Time%></h3>
+<h3>Connector Response Time</h3>
 <%= column_chart Connector.group(:name).average(:exec_time) %>
-<h3>Connector Response by by Month</h3>
+<h3>Connector Response Time by Month</h3>
 <%= line_chart Connector.group(:name).group_by_month(:time).average(:exec_time) %>
-<h3>Connector Response by Week</h3>
+<h3>Connector Response Time by Week</h3>
 <%= line_chart Connector.group(:name).group_by_week(:time).average(:exec_time) %>
-<h3>Connector Response by Day</h3>
+<h3>Connector Response Time by Day</h3>
 <%= line_chart Connector.group(:name).group_by_day(:time).average(:exec_time) %>
-<h3>Connector Response by Hour of Day</h3>
+<h3>Connector Response Time by Hour of Day</h3>
 <%= line_chart Connector.group(:name).group_by_hour_of_day(:time).average(:exec_time) %>
-<h3>Connector Response by Day of Week</h3>
+<h3>Connector Response Time by Day of Week</h3>
 <%= line_chart Connector.group(:name).group_by_day_of_week(:time).average(:exec_time) %>
-<h3>Connector Response by Day of Month</h3>
+<h3>Connector Response Time by Day of Month</h3>
 <%= line_chart Connector.group(:name).group_by_day_of_month(:time).average(:exec_time) %>
