@@ -1,6 +1,5 @@
 Rails.application.routes.draw do
 
-  get 'connector/index'
 
   get 'transactions' => 'transactions#index'
   get 'connectors' => 'connectors#index'

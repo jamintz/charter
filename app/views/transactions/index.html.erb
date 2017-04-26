@@ -23,7 +23,7 @@
 <h3>Transactions by <%="#{cut.capitalize}"%> by Hour of Day</h3>
 <%= line_chart Transaction.group(cut).group_by_hour_of_day(:time).count %>
 <h3>Transactions by <%="#{cut.capitalize}"%> by Day of Week</h3>
-<%= line_chart Transaction.group(:ip).group_by_day_of_week(:time).count %>
+<%= line_chart Transaction.group(cut).group_by_day_of_week(:time).count %>
 <h3>Transactions by <%="#{cut.capitalize}"%> by Day of Month</h3>
 <%= line_chart Transaction.group(cut).group_by_day_of_month(:time).count %>
 <% end %>
