@@ -1,13 +1,3 @@
-<h3>Total Connector Usage</h3>
-<%= column_chart Connector.group(:name).count %>
-<h3>Connector Usage by Month</h3>
-<%= line_chart Connector.group(:name).group_by_month(:time).count %>
-<h3>Connector Usage by Week</h3>
-<%= line_chart Connector.group(:name).group_by_week(:time).count %>
-<h3>Connector Usage by Day</h3>
-<%= line_chart Connector.group(:name).group_by_day(:time).count %>
-
-
 <h3>Connector Response Time</h3>
 <%= column_chart Connector.group(:name).average(:exec_time) %>
 <h3>Connector Response Time by Month</h3>
