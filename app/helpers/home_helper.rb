@@ -1,6 +1,10 @@
 require 'csv'
+require 'histogram/array'
 module HomeHelper
   
+  def is_num string
+    true if Float(string) rescue false
+  end
   #input = select * from attributes where...
   def load_attrs 
     first = true
@@ -23,16 +27,37 @@ module HomeHelper
         connector = row.index('connector')
         first = false
       else
-        Attribute.create(name:row[name],
+        Attribute.create(
+        name:row[name],
         result:row[res],
         time:row[time],
         library:row[lib],
-        exec_time:row[exec_time],
-        connector:row[connector]
+        connector:row[connector],
         )
       end
+      Connector.find_or_create_by(
+      name:row[connector],
+      exec_time:row[exec_time],
+      time:row[time],
+      library:row[lib])
       i+=1
     end
+    
+    Attribute.distinct.pluck(:name).each do |name|
+      ats = Attribute.where(name:name)
+      res = ats.map(&:result)
+      uni = res.uniq
+      uni.reject!{|x|x.nil? || x == 'unknown' || x == '[FILTERED]'}
+      if uni.map{|x|is_num(x)}.uniq == [true] && uni.count > 10
+        bins, freqs = res.reject!{|x|x.nil? || x == 'unknown' || x == '[FILTERED]'}.histogram(10)
+        Array(0..9).each do |i|
+          Bin.create(
+          bin:bins[i],
+          freq:freqs[i],
+          name:name)
+        end
+      end
+    end  
   end
   
   #input = select * from transactions where...
@@ -75,5 +100,6 @@ module HomeHelper
       i+=1
     end
   end
+
 
 end

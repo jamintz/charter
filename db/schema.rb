@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170426012907) do
+ActiveRecord::Schema.define(version: 20170426025115) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -22,6 +22,23 @@ ActiveRecord::Schema.define(version: 20170426012907) do
     t.integer  "library"
     t.float    "exec_time"
     t.string   "connector"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "bins", force: :cascade do |t|
+    t.string   "bin"
+    t.string   "freq"
+    t.string   "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "connectors", force: :cascade do |t|
+    t.string   "name"
+    t.float    "exec_time"
+    t.datetime "time"
+    t.string   "library"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end

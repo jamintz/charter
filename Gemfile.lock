@@ -58,6 +58,7 @@ GEM
       activesupport (>= 4.2.0)
     groupdate (3.2.0)
       activesupport (>= 3)
+    histogram (0.2.4.1)
     i18n (0.8.1)
     jbuilder (2.6.3)
       activesupport (>= 3.0.0, < 5.2)
@@ -161,6 +162,7 @@ DEPENDENCIES
   chartkick
   coffee-rails (~> 4.2)
   groupdate
+  histogram
   jbuilder (~> 2.5)
   jquery-rails
   listen (~> 3.0.5)
