@@ -11,7 +11,7 @@
 <h3>Transactions by Day of Month</h3>
 <%= line_chart Transaction.group_by_day_of_month(:time).count %>
 
-<% [:ip, :status, :region, :apikey].each do |cut|%>
+<% [:library, :ip, :status, :region, :apikey].each do |cut|%>
 <h3>Transactions by <%="#{cut.capitalize}"%></h3>
 <%= column_chart Transaction.group(cut).count %>
 <h3>Transactions by <%="#{cut.capitalize}"%> by Month</h3>
@@ -41,7 +41,7 @@
 <h3>Execution Time by Day of Month</h3>
 <%= line_chart Transaction.group_by_day_of_month(:time).average(:duration) %>
 
-<% [:ip, :status, :region, :apikey].each do |cut|%>
+<% [:library, :ip, :status, :region, :apikey].each do |cut|%>
 <h3>Execution Time by <%="#{cut.capitalize}"%></h3>
 <%= column_chart Transaction.group(cut).average(:duration) %>
 <h3>Execution Time by <%="#{cut.capitalize}"%> by Month</h3>
