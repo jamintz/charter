@@ -16,7 +16,7 @@ module HomeHelper
     exec_time=nil
     connector=nil
     
-    x = CSV.foreach('/users/jasonmintz/Downloads/at_sample.csv') do |row|
+    x = CSV.foreach('/users/jasonmintz/desktop/nab_attrs.csv') do |row|
       puts i
       if first
         name = row.index('attribute_name')
@@ -27,7 +27,8 @@ module HomeHelper
         connector = row.index('connector')
         first = false
       else
-        next unless row[res] && row[connector]
+        row[res] ||= 'na'
+        row[connector] ||= 'none'
         Attribute.create(
         name:row[name],
         result:eval(row[res]),
@@ -111,7 +112,7 @@ module HomeHelper
     reg=nil
     apikey=nil
     
-    x = CSV.foreach('/users/jasonmintz/Downloads/transactions.csv') do |row|
+    x = CSV.foreach('/users/jasonmintz/desktop/nab_trx.csv') do |row|
       puts i
       if first
         lib = row.index('library_id')
