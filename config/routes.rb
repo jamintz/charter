@@ -6,6 +6,9 @@ Rails.application.routes.draw do
   get 'connectors' => 'connectors#index'
   get 'attributes' => 'attributes#index'
   
+  resources :clients
+  
+  
 
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
   root 'clients#index'
