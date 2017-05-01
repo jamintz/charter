@@ -19,6 +19,7 @@ module HomeHelper
     
     x = CSV.foreach('/users/jasonmintz/desktop/nab_attrs.csv') do |row|
       puts i
+      i+=1
       if first
         name = row.index('attribute_name')
         res = row.index('attribute_result')
@@ -35,9 +36,9 @@ module HomeHelper
         name:row[connector],
         exec_time:row[exec_time],
         time:row[time],
-        library:row[lib])
+        library:row[lib]) unless row[connector].nil? || row[connector].empty?
         
-        next if row[par].nil? || row[par].empty?
+        next unless row[par].nil? || row[par].empty?
         
         Attribute.create(
         name:row[name],
@@ -47,7 +48,6 @@ module HomeHelper
         connector:row[connector] || 'unknown',
         )
       end
-      i+=1
     end
     
     Attribute.distinct([:name,:connector]).pluck(:name,:connector).each do |name,connector|
