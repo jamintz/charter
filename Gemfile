@@ -55,3 +55,5 @@ gem 'chartkick'
 gem 'byebug'
 gem 'groupdate'
 gem 'histogram'
+gem 'filestack-rails', require: 'filepicker-rails'
+

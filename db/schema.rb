@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170426145843) do
+ActiveRecord::Schema.define(version: 20170501202637) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -22,8 +22,10 @@ ActiveRecord::Schema.define(version: 20170426145843) do
     t.integer  "library"
     t.float    "exec_time"
     t.string   "connector"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at",       null: false
+    t.datetime "updated_at",       null: false
+    t.string   "filepicker_field"
+    t.integer  "client_id"
   end
 
   create_table "bins", force: :cascade do |t|
@@ -37,6 +39,14 @@ ActiveRecord::Schema.define(version: 20170426145843) do
     t.string   "connector"
     t.string   "week"
     t.string   "month"
+  end
+
+  create_table "clients", force: :cascade do |t|
+    t.string   "name"
+    t.string   "trx_url"
+    t.string   "attr_url"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "connectors", force: :cascade do |t|
@@ -67,11 +77,13 @@ ActiveRecord::Schema.define(version: 20170426145843) do
     t.string   "kind"
     t.float    "duration"
     t.string   "ip"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at",       null: false
+    t.datetime "updated_at",       null: false
     t.string   "status"
     t.string   "region"
     t.string   "apikey"
+    t.string   "filepicker_field"
+    t.integer  "client_id"
   end
 
 end
