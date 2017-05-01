@@ -15,6 +15,7 @@ module HomeHelper
     lib=nil
     exec_time=nil
     connector=nil
+    par=nil
     
     x = CSV.foreach('/users/jasonmintz/desktop/nab_attrs.csv') do |row|
       puts i
@@ -25,22 +26,26 @@ module HomeHelper
         lib = row.index('library_id')
         exec_time = row.index('http_time')
         connector = row.index('connector')
+        par = row.index('parent_attribute_transaction_id')
         first = false
       else
-        row[res] ||= 'na'
-        row[connector] ||= 'none'
-        Attribute.create(
-        name:row[name],
-        result:eval(row[res]),
-        time:row[time],
-        library:row[lib],
-        connector:row[connector],
-        )
+        next unless row[res]
+        
         Connector.find_or_create_by(
         name:row[connector],
         exec_time:row[exec_time],
         time:row[time],
         library:row[lib])
+        
+        next if row[par].nil? || row[par].empty?
+        
+        Attribute.create(
+        name:row[name],
+        result:eval(row[res]),
+        time:row[time],
+        library:row[lib],
+        connector:row[connector] || 'unknown',
+        )
       end
       i+=1
     end
@@ -55,6 +60,7 @@ module HomeHelper
       res.each{|x|h[x]+=1}
       cap = res.count / 25.0
       keep,oth = h.partition{|k,v|v >= cap}
+      next unless oth.map(&:first).count > 0 || keep.map(&:first).count > 1
       sel.group_by{|x|x.time.strftime('%m-%Y')}.each do |month,as|
         as.group_by{|x|x.time.strftime('%U')}.each do |week, as2|
           vals = as2.map(&:result)

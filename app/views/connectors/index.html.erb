@@ -1,6 +1,4 @@
-<% Connector.distinct(:name).pluck(:name).each do |name| %>
-<h3><%="#{name.capitalize} "%>Connector Response Time</h3>
-<%= column_chart Connector.where(name:name).average(:exec_time) %>
+<% Connector.distinct(:name).pluck(:name).sort.each do |name| %>
 <h3><%="#{name.capitalize} "%>Connector Response Time by Month</h3>
 <%= line_chart Connector.where(name:name).group_by_month(:time).average(:exec_time) %>
 <h3><%="#{name.capitalize} "%>Connector Response Time by Week</h3>
