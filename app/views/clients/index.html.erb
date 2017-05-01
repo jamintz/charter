@@ -1,0 +1,9 @@
+    <%= filepicker_js_include_tag %>
+  <%= form_for @client do |f| %>
+      <div>
+        <%= f.label :avatar_url, "Upload Your Avatar:" %>
+        <%= f.filepicker_field :avatar_url %> <!-- User#avatar_url is a regular string column -->
+      </div>
+
+      <%= f.submit %>
+    <% end %>
