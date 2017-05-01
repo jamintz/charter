@@ -1,9 +1,27 @@
+	  <tr>
+		  <th>Name</th>
+		  <th>Transactions</th>
+		  <th>Connectors</th>
+		  <th>Attributes</th>
+	  </tr>
+	  <% @clients.each do |c| %>
+	  <tr>
+	  <td><%=c.name%></td>
+	<td><%= link_to 'Transactions', transactions_path(c.name) %></td>
+	<td><%= link_to 'Connectors', connectors_path(c.name) %></td>
+	<td><%= link_to 'Attributes', attributes_path(c.name) %></td>
+</tr>
+<% end %>
+</table>
+  
     <%= filepicker_js_include_tag %>
   <%= form_for(@client,url:clients_path) do |f| %>
-      <div>
-        <%= f.label :trx_url, "Upload Your Avatar:" %>
+      <div style="margin-top:50px"> 
+        <%= f.label :trx_url, "Choose Transaction File:" %>
         <%= f.filepicker_field :trx_url %> <!-- User#avatar_url is a regular string column -->
       </div>
 
-      <%= f.submit %>
+      <%= f.submit "Upload"%>
     <% end %>
+	
+	
