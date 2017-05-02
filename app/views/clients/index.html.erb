@@ -5,9 +5,11 @@
 	  <% @clients.each do |c| %>
 	  <tr>
 	  <td><%=c.name%></td>
-	<td><%= link_to 'Transactions', transactions_path(c.name) %></td>
-	<td><%= link_to 'Connectors', connectors_path(c.name) %></td>
-	<td><%= link_to 'Attributes', attrs_path(c.name) %></td>
+	<td><%= link_to 'Transactions', transactions_path(:org => c.id) %></td>
+	<td><%= link_to 'Connectors', connectors_path(:org => c.id) %></td>
+	<td><%= link_to 'Attributes', attrs_path(:org => c.id) %></td>
+    <td><%= link_to 'Delete', c, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+
 </tr>
 <% end %>
 </table>

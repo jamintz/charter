@@ -13,6 +13,14 @@ class ClientsController < ApplicationController
     true if Float(string) rescue false
   end
   
+  def destroy
+    Client.find(params['id']).destroy
+    respond_to do |format|
+      format.html { redirect_to clients_url, notice: 'Client Destroyed' }
+      format.json { head :no_content }
+    end
+  end
+  
   def add_trx
     first = true
     i = 0
@@ -26,6 +34,7 @@ class ClientsController < ApplicationController
     apikey=nil
     
     client = Client.create(name:params['name'],trx_url:params['trx_url'],attr_url:params['attr_url'])
+    cid = client.id
     
     unless client.trx_url.empty?
       CSV.new(open(client.trx_url)).each do |row|
@@ -42,7 +51,7 @@ class ClientsController < ApplicationController
            first = false
          else
            Transaction.create(kind:row[type],
-           client_id:client.id,
+           client_id:cid,
            ip:row[ip],
            time:row[time],
            library:row[lib],
@@ -80,6 +89,7 @@ class ClientsController < ApplicationController
         
           Connector.find_or_create_by(
           name:row[connector],
+          client_id:cid,
           exec_time:row[exec_time],
           time:row[time],
           library:row[lib]) unless row[connector].nil? || row[connector].empty?
@@ -88,7 +98,7 @@ class ClientsController < ApplicationController
         
           Attr.create(
           name:row[name],
-          client_id:client.id,
+          client_id:cid,
           result:eval(row[res]),
           time:row[time],
           library:row[lib],
@@ -118,6 +128,7 @@ class ClientsController < ApplicationController
             tot = h.values.sum
             h.each do |k,v|
               Factor.find_or_create_by(
+              client_id:cid,
               name:name,
               level:k,
               freq:(v/(tot*1.0)).round(2),
@@ -137,6 +148,7 @@ class ClientsController < ApplicationController
               tot = f2.sum
               Array(0..9).each do |i|
                 Bin.find_or_create_by(
+                client_id:cid,
                 bin:b2[i].to_f.round(2),
                 freq:(f2[i]/(tot*1.0)).round(2),
                 name:name,

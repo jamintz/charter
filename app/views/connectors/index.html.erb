@@ -1,14 +1,14 @@
-<% Connector.distinct(:name).pluck(:name).sort.each do |name| %>
+<% @connectors.distinct(:name).pluck(:name).sort.each do |name| %>
 <h3><%="#{name.capitalize} "%>Connector Response Time by Month</h3>
-<%= line_chart Connector.where(name:name).group_by_month(:time).average(:exec_time) %>
+<%= line_chart @connectors.where(name:name).group_by_month(:time).average(:exec_time) %>
 <h3><%="#{name.capitalize} "%>Connector Response Time by Week</h3>
-<%= line_chart Connector.where(name:name).group_by_week(:time).average(:exec_time) %>
+<%= line_chart @connectors.where(name:name).group_by_week(:time).average(:exec_time) %>
 <h3><%="#{name.capitalize} "%>Connector Response Time by Day</h3>
-<%= line_chart Connector.where(name:name).group_by_day(:time).average(:exec_time) %>
+<%= line_chart @connectors.where(name:name).group_by_day(:time).average(:exec_time) %>
 <h3><%="#{name.capitalize} "%>Connector Response Time by Hour of Day</h3>
-<%= line_chart Connector.where(name:name).group_by_hour_of_day(:time).average(:exec_time) %>
+<%= line_chart @connectors.where(name:name).group_by_hour_of_day(:time).average(:exec_time) %>
 <h3><%="#{name.capitalize} "%>Connector Response Time by Day of Week</h3>
-<%= line_chart Connector.where(name:name).group_by_day_of_week(:time).average(:exec_time) %>
+<%= line_chart @connectors.where(name:name).group_by_day_of_week(:time).average(:exec_time) %>
 <h3><%="#{name.capitalize} "%>Connector Response Time by Day of Month</h3>
-<%= line_chart Connector.where(name:name).group_by_day_of_month(:time).average(:exec_time) %>
+<%= line_chart @connectors.where(name:name).group_by_day_of_month(:time).average(:exec_time) %>
 <% end %>

@@ -6,13 +6,10 @@ Rails.application.routes.draw do
   get 'connectors' => 'connectors#index'
   get 'attrs' => 'attrs#index'
   
-  resources :clients do
-    member do
-      get 'show'
-    end
-  end
+  resources :clients
   
   post '/clients/add_trx'
+  post '/clients/delete'
   
 
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
