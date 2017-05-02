@@ -11,6 +11,7 @@ class ClientsController < ApplicationController
   @time = nil
   @dur = nil
   @ip = nil
+  @cid = nil
   @status = nil
   @reg = nil
   @apikey = nil
@@ -172,7 +173,7 @@ class ClientsController < ApplicationController
             tot = h.values.sum
             h.each do |k,v|
               Factor.find_or_create_by(
-              client_id:cid,
+              client_id:@cid,
               name:name,
               level:k,
               freq:(v/(tot*1.0)).round(2),
@@ -192,7 +193,7 @@ class ClientsController < ApplicationController
               tot = f2.sum
               Array(0..9).each do |i|
                 Bin.find_or_create_by(
-                client_id:cid,
+                client_id:@cid,
                 bin:b2[i].to_f.round(2),
                 freq:(f2[i]/(tot*1.0)).round(2),
                 name:name,
