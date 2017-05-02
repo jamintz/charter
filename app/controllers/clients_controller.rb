@@ -41,7 +41,7 @@ class ClientsController < ApplicationController
     reg=nil
     apikey=nil
     
-    client = Client.create(name:params['name'],trx_url:params['trx_url'],attr_url:params['attr_url'])
+    client = Client.find_or_create_by(name:params['name'],trx_url:params['trx_url'],attr_url:params['attr_url'])
     cid = client.id
     
     unless client.trx_url.empty?
@@ -58,7 +58,7 @@ class ClientsController < ApplicationController
          
            first = false
          else
-           Transaction.create(kind:row[type],
+           Transaction.find_or_create_by(kind:row[type],
            client_id:cid,
            ip:row[ip],
            time:row[time],
@@ -104,7 +104,7 @@ class ClientsController < ApplicationController
         
           next unless row[par].nil? || row[par].empty?
         
-          Attr.create(
+          Attr.find_or_create_by(
           name:row[name],
           client_id:cid,
           result:eval(row[res]),
