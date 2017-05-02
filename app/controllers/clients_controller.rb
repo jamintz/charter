@@ -51,7 +51,7 @@ class ClientsController < ApplicationController
       @par = row.index('parent_attribute_transaction_id')
       @first = false
     else
-      return unless row[@res]
+      return unless @res && row[@res]
     
       Connector.find_or_create_by(
       name:row[@connector],
@@ -60,7 +60,7 @@ class ClientsController < ApplicationController
       time:row[@time],
       library:row[@lib]) unless row[@connector].nil? || row[@connector].empty?
     
-      return unless row[@par].nil? || row[@par].empty?
+      return unless @par && (row[@par].nil? || row[@par].empty?)
     
       Attr.find_or_create_by(
       name:row[@name],
@@ -82,7 +82,7 @@ class ClientsController < ApplicationController
     c.factors.destroy_all
     c.destroy
     respond_to do |format|
-      format.html { redirect_to clients_url, notice: 'Client Destroyed' }
+      format.html { redirect_to root_url, notice: 'Client Destroyed' }
       format.json { head :no_content }
     end
   end
@@ -90,15 +90,23 @@ class ClientsController < ApplicationController
   def add_trx
     if params['name'].empty?
       respond_to do |format|
-        format.html { redirect_to clients_url, notice: 'Name is required' }
+        format.html { redirect_to root_url, notice: 'Name is required' }
         format.json { head :no_content }
       end
       return
     end
     
-    client = Client.find_or_create_by(name:params['name'],trx_url:params['trx_url'],attr_url:params['attr_url'])
+    client = Client.find_or_create_by(name:params['name'])
+    client.trx_url = params['trx_url']
+    client.attr_url = params['attr_url']
+    client.save!
     @cid = client.id
     @first = true   
+    
+    respond_to do |format|
+      format.html { redirect_to root_url, notice: 'Processing' }
+      format.json { head :no_content }
+    end
     
     unless client.trx_url.empty?     
       begin
@@ -183,10 +191,6 @@ class ClientsController < ApplicationController
       end
     end
     Attr.destroy_all  
-    respond_to do |format|
-      format.html { redirect_to clients_url, notice: 'Done!' }
-      format.json { head :no_content }
-    end
       
   end
   
