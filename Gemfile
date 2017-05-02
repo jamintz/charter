@@ -53,8 +53,7 @@ end
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 gem 'chartkick'
-gem 'byebug'
 gem 'groupdate'
 gem 'histogram'
 gem 'filestack-rails', require: 'filepicker-rails'
-
+gem 'rubyzip'

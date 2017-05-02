@@ -1,6 +1,9 @@
 require 'open-uri'
 require 'csv'
 require 'histogram/array'
+require 'rubygems'
+require 'zip'
+require 'tempfile'
 
 class ClientsController < ApplicationController
 
@@ -13,8 +16,71 @@ class ClientsController < ApplicationController
     true if Float(string) rescue false
   end
   
+  def make_trx row
+    if @first
+      @lib = row.index('library_id')
+      @type = row.index('transaction_type')
+      @time = row.index('transaction_time')
+      @dur = row.index('transaction_duration')
+      @ip = row.index('ip_address')
+      @status = row.index('status')
+      @reg = row.index('aws_region')
+      @apikey = row.index('api_key')
+      @first = false
+    else
+      Transaction.find_or_create_by(kind:row[@type],
+      client_id:@cid,
+      ip:row[@ip],
+      time:row[@time],
+      library:row[@lib],
+      duration:row[@dur],
+      status:row[@status],
+      region:row[@reg],
+      apikey:row[@apikey])
+    end
+  end
+    
+  def make_attr row
+    if @first
+      @name = row.index('attribute_name')
+      @res = row.index('attribute_result')
+      @time = row.index('transaction_time')
+      @lib = row.index('library_id')
+      @exec_time = row.index('http_time')
+      @connector = row.index('connector')
+      @par = row.index('parent_attribute_transaction_id')
+      @first = false
+    else
+      return unless row[@res]
+    
+      Connector.find_or_create_by(
+      name:row[@connector],
+      client_id:@cid,
+      exec_time:row[@exec_time],
+      time:row[@time],
+      library:row[@lib]) unless row[@connector].nil? || row[@connector].empty?
+    
+      return unless row[@par].nil? || row[@par].empty?
+    
+      Attr.find_or_create_by(
+      name:row[@name],
+      client_id:@cid,
+      result:eval(row[@res]),
+      time:row[@time],
+      library:row[@lib],
+      connector:row[@connector] || 'unknown',
+      )
+    end
+  end
+  
   def destroy
-    Client.find(params['id']).destroy
+    c = Client.find(params['id'])
+    c.transactions.destroy_all
+    c.connectors.destroy_all
+    c.attributes.destroy_all
+    c.bins.destroy_all
+    c.factors.destroy_all
+    c.destroy
     respond_to do |format|
       format.html { redirect_to clients_url, notice: 'Client Destroyed' }
       format.json { head :no_content }
@@ -30,89 +96,36 @@ class ClientsController < ApplicationController
       return
     end
     
-    first = true
-    i = 0
-    lib = nil
-    type=nil
-    time=nil
-    dur=nil
-    ip=nil
-    status=nil
-    reg=nil
-    apikey=nil
-    
     client = Client.find_or_create_by(name:params['name'],trx_url:params['trx_url'],attr_url:params['attr_url'])
-    cid = client.id
+    @cid = client.id
+    @first = true   
     
-    unless client.trx_url.empty?
-      CSV.new(open(client.trx_url)).each do |row|
-         if first
-           lib = row.index('library_id')
-           type = row.index('transaction_type')
-           time = row.index('transaction_time')
-           dur = row.index('transaction_duration')
-           ip = row.index('ip_address')
-           status = row.index('status')
-           reg = row.index('aws_region')
-           apikey = row.index('api_key')
-         
-           first = false
-         else
-           Transaction.find_or_create_by(kind:row[type],
-           client_id:cid,
-           ip:row[ip],
-           time:row[time],
-           library:row[lib],
-           duration:row[dur],
-           status:row[status],
-           region:row[reg],
-           apikey:row[apikey])
-         end
-      end   
+    unless client.trx_url.empty?     
+      begin
+        file = Zip::File.open(open(client.trx_url)).first
+        CSV.new(file.get_input_stream.read).each do |row|
+          make_trx(row)
+        end   
+      rescue
+        file = client.trx_url
+        CSV.new(open(file)).each do |row|
+          make_trx(row)
+        end 
+      end
+      @first = true   
     end  
     
-    unless client.attr_url.empty?
-      first = true
-      i = 0
-      name = nil
-      res=nil
-      time=nil
-      lib=nil
-      exec_time=nil
-      connector=nil
-      par=nil
-    
-      CSV.new(open(client.attr_url)).each do |row|
-        if first
-          name = row.index('attribute_name')
-          res = row.index('attribute_result')
-          time = row.index('transaction_time')
-          lib = row.index('library_id')
-          exec_time = row.index('http_time')
-          connector = row.index('connector')
-          par = row.index('parent_attribute_transaction_id')
-          first = false
-        else
-          next unless row[res]
-        
-          Connector.find_or_create_by(
-          name:row[connector],
-          client_id:cid,
-          exec_time:row[exec_time],
-          time:row[time],
-          library:row[lib]) unless row[connector].nil? || row[connector].empty?
-        
-          next unless row[par].nil? || row[par].empty?
-        
-          Attr.find_or_create_by(
-          name:row[name],
-          client_id:cid,
-          result:eval(row[res]),
-          time:row[time],
-          library:row[lib],
-          connector:row[connector] || 'unknown',
-          )
-        end
+    unless client.attr_url.empty?   
+      begin
+        file = Zip::File.open(open(client.attr_url)).first
+        CSV.new(file.get_input_stream.read).each do |row|
+          make_attr(row)
+        end   
+      rescue
+        file = client.trx_url
+        CSV.new(open(file)).each do |row|
+          make_attr(row)
+        end 
       end
     
       Attr.distinct([:name,:connector]).pluck(:name,:connector).each do |name,connector|
@@ -175,6 +188,6 @@ class ClientsController < ApplicationController
       format.json { head :no_content }
     end
       
-     
   end
+  
 end
