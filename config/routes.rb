@@ -4,10 +4,15 @@ Rails.application.routes.draw do
 
   get 'transactions' => 'transactions#index'
   get 'connectors' => 'connectors#index'
-  get 'attributes' => 'attributes#index'
+  get 'attrs' => 'attrs#index'
   
-  resources :clients
+  resources :clients do
+    member do
+      get 'show'
+    end
+  end
   
+  post '/clients/add_trx'
   
 
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html

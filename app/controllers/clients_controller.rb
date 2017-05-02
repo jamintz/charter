@@ -1,5 +1,6 @@
 require 'open-uri'
 require 'csv'
+require 'histogram/array'
 
 class ClientsController < ApplicationController
 
@@ -8,48 +9,152 @@ class ClientsController < ApplicationController
     @clients = Client.all
   end
   
-  def create
+  def is_num string
+    true if Float(string) rescue false
+  end
+  
+  def add_trx
     first = true
     i = 0
-    name = nil
-    res=nil
+    lib = nil
+    type=nil
     time=nil
-    lib=nil
-    exec_time=nil
-    connector=nil
-    par=nil
-    CSV.new(open(url)).each do |row|
-      puts i
-      i+=1
-      if first
-        name = row.index('attribute_name')
-        res = row.index('attribute_result')
-        time = row.index('transaction_time')
-        lib = row.index('library_id')
-        exec_time = row.index('http_time')
-        connector = row.index('connector')
-        par = row.index('parent_attribute_transaction_id')
-        first = false
-      else
-        next unless row[res]
+    dur=nil
+    ip=nil
+    status=nil
+    reg=nil
+    apikey=nil
+    
+    client = Client.create(name:params['name'],trx_url:params['trx_url'],attr_url:params['attr_url'])
+    
+    unless client.trx_url.empty?
+      CSV.new(open(client.trx_url)).each do |row|
+         if first
+           lib = row.index('library_id')
+           type = row.index('transaction_type')
+           time = row.index('transaction_time')
+           dur = row.index('transaction_duration')
+           ip = row.index('ip_address')
+           status = row.index('status')
+           reg = row.index('aws_region')
+           apikey = row.index('api_key')
+         
+           first = false
+         else
+           Transaction.create(kind:row[type],
+           client_id:client.id,
+           ip:row[ip],
+           time:row[time],
+           library:row[lib],
+           duration:row[dur],
+           status:row[status],
+           region:row[reg],
+           apikey:row[apikey])
+         end
+      end   
+    end  
+    
+    unless client.attr_url.empty?
+      first = true
+      i = 0
+      name = nil
+      res=nil
+      time=nil
+      lib=nil
+      exec_time=nil
+      connector=nil
+      par=nil
+    
+      CSV.new(open(client.attr_url)).each do |row|
+        if first
+          name = row.index('attribute_name')
+          res = row.index('attribute_result')
+          time = row.index('transaction_time')
+          lib = row.index('library_id')
+          exec_time = row.index('http_time')
+          connector = row.index('connector')
+          par = row.index('parent_attribute_transaction_id')
+          first = false
+        else
+          next unless row[res]
         
-        Connector.find_or_create_by(
-        name:row[connector],
-        exec_time:row[exec_time],
-        time:row[time],
-        library:row[lib]) unless row[connector].nil? || row[connector].empty?
+          Connector.find_or_create_by(
+          name:row[connector],
+          exec_time:row[exec_time],
+          time:row[time],
+          library:row[lib]) unless row[connector].nil? || row[connector].empty?
         
-        next unless row[par].nil? || row[par].empty?
+          next unless row[par].nil? || row[par].empty?
         
-        Attribute.create(
-        name:row[name],
-        result:eval(row[res]),
-        time:row[time],
-        library:row[lib],
-        connector:row[connector] || 'unknown',
-        )
+          Attr.create(
+          name:row[name],
+          client_id:client.id,
+          result:eval(row[res]),
+          time:row[time],
+          library:row[lib],
+          connector:row[connector] || 'unknown',
+          )
+        end
+      end
+    
+      Attr.distinct([:name,:connector]).pluck(:name,:connector).each do |name,connector|
+        ats = Attr.where(name:name,connector:connector)
+        sel = ats.order("RANDOM()").limit(100000)
+        res = sel.map(&:result)
+      
+        h = Hash.new(0)
+        res.each{|x|h[x]+=1}
+        cap = res.count / 25.0
+        keep,oth = h.partition{|k,v|v >= cap}
+        next unless oth.map(&:first).count > 0 || keep.map(&:first).count > 1
+        sel.group_by{|x|x.time.strftime('%m-%Y')}.each do |month,as|
+          as.group_by{|x|x.time.strftime('%U')}.each do |week, as2|
+            vals = as2.map(&:result)
+            h = Hash.new(0)
+            keep.map(&:first).each do |k|
+              h[k] = as2.select{|x|x.result==k}.count
+            end
+            h['other'] = as2.count - h.values.sum unless oth.empty?
+            tot = h.values.sum
+            h.each do |k,v|
+              Factor.find_or_create_by(
+              name:name,
+              level:k,
+              freq:(v/(tot*1.0)).round(2),
+              connector:connector,
+              week:week,
+              month:month)
+            end
+          end
+        end
+        uni = res.uniq
+        uni.reject!{|x|x.nil? || x == 'unknown' || x == '[FILTERED]'}
+        if uni.map{|x|is_num(x)}.uniq == [true] && uni.count > 10
+          bins, freqs = res.reduce([]){|a,x|a.push(x.to_f) unless x.nil? || x == 'unknown' || x == '[FILTERED]';a}.histogram(10)
+          sel.group_by{|x|x.time.strftime('%m-%Y')}.each do |month,as|
+            as.group_by{|x|x.time.strftime('%U')}.each do |week, as2|
+              b2, f2 = as2.map(&:result).reduce([]){|a,x|a.push(x.to_f) unless x.nil? || x == 'unknown' || x == '[FILTERED]';a}.histogram(bins)
+              tot = f2.sum
+              Array(0..9).each do |i|
+                Bin.find_or_create_by(
+                bin:b2[i].to_f.round(2),
+                freq:(f2[i]/(tot*1.0)).round(2),
+                name:name,
+                connector:connector,
+                week:week,
+                month:month)
+              end
+            end
+          end       
+        end
       end
     end
       
+    respond_to do |format|
+      format.html { redirect_to clients_url, notice: 'Done!' }
+      format.json { head :no_content }
+    end
+      
+     
   end
 end

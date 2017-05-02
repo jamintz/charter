@@ -1,27 +1,30 @@
-	  <tr>
-		  <th>Name</th>
-		  <th>Transactions</th>
-		  <th>Connectors</th>
-		  <th>Attributes</th>
-	  </tr>
+<%= filepicker_js_include_tag %>
+<p id="notice"><%= notice %></p>
+
+<table>
 	  <% @clients.each do |c| %>
 	  <tr>
 	  <td><%=c.name%></td>
 	<td><%= link_to 'Transactions', transactions_path(c.name) %></td>
 	<td><%= link_to 'Connectors', connectors_path(c.name) %></td>
-	<td><%= link_to 'Attributes', attributes_path(c.name) %></td>
+	<td><%= link_to 'Attributes', attrs_path(c.name) %></td>
 </tr>
 <% end %>
 </table>
-  
-    <%= filepicker_js_include_tag %>
-  <%= form_for(@client,url:clients_path) do |f| %>
+  <%= form_tag({controller: "clients", action: "add_trx"}) do %>
       <div style="margin-top:50px"> 
-        <%= f.label :trx_url, "Choose Transaction File:" %>
-        <%= f.filepicker_field :trx_url %> <!-- User#avatar_url is a regular string column -->
+		<%= label_tag :client_name %>
+        <%= text_field_tag :name%>
+		<br>
+        <%= label_tag :trx_url, "Choose Transaction File:" %>
+        <%= filepicker_field_tag :trx_url %>
+		<br>
+        <%= label_tag :attr_url, "Choose Attribute File:" %>
+        <%= filepicker_field_tag :attr_url %>
+		<br>
       </div>
 
-      <%= f.submit "Upload"%>
+      <%= submit_tag "Upload"%>
     <% end %>
 	
 	
