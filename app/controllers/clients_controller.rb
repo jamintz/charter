@@ -182,7 +182,7 @@ class ClientsController < ApplicationController
         end
       end
     end
-      
+    Attr.destroy_all  
     respond_to do |format|
       format.html { redirect_to clients_url, notice: 'Done!' }
       format.json { head :no_content }
