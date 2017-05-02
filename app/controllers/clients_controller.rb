@@ -74,10 +74,10 @@ class ClientsController < ApplicationController
   end
   
   def destroy
-    c = Client.find(params['id']).first
+    c = Client.find(params['id'])
     c.transactions.destroy_all
     c.connectors.destroy_all
-    c.attributes.destroy_all
+    c.attrs.destroy_all
     c.bins.destroy_all
     c.factors.destroy_all
     c.destroy
