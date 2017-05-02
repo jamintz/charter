@@ -6,7 +6,21 @@ require 'zip'
 require 'tempfile'
 
 class ClientsController < ApplicationController
-
+  @lib = nil
+  @type = nil
+  @time = nil
+  @dur = nil
+  @ip = nil
+  @status = nil
+  @reg = nil
+  @apikey = nil
+  @first = nil
+  @name = nil
+  @res = nil
+  @exec_time = nil
+  @connector = nil
+  @par = nil
+  
   def index
     @client = Client.new
     @clients = Client.all
