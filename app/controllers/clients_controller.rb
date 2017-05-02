@@ -22,6 +22,14 @@ class ClientsController < ApplicationController
   end
   
   def add_trx
+    if params['name'].empty?
+      respond_to do |format|
+        format.html { redirect_to clients_url, notice: 'Name is required' }
+        format.json { head :no_content }
+      end
+      return
+    end
+    
     first = true
     i = 0
     lib = nil

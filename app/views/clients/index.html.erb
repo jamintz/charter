@@ -1,6 +1,7 @@
 <%= filepicker_js_include_tag %>
 <p id="notice"><%= notice %></p>
 
+<h2>Existing Orgs</h2>
 <table>
 	  <% @clients.each do |c| %>
 	  <tr>
@@ -13,6 +14,8 @@
 </tr>
 <% end %>
 </table>
+<h2>New Org</h2>
+
   <%= form_tag({controller: "clients", action: "add_trx"}) do %>
       <div style="margin-top:50px"> 
 		<%= label_tag :client_name %>
@@ -28,5 +31,7 @@
 
       <%= submit_tag "Upload"%>
     <% end %>
+		
 	
-	
+	<p>Transaction file is the downloaded CSV output of <a href="http://hub-metabase-elb.us.mt.p.demystdata.com/card/431" target="_blank">Metabase card 431</a> with the org_id of the organization you care about substituted into "l.organization_id" in the SQL</p>
+	<p>Attribute file is the downloaded CSV output of <a href="http://hub-metabase-elb.us.mt.p.demystdata.com/card/430" target="_blank">Metabase card 430</a> with the org_id of the organization you care about substituted into "l.organization_id" in the SQL</p>
