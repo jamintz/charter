@@ -51,6 +51,7 @@ class ClientsController < ApplicationController
       @par = row.index('parent_attribute_transaction_id')
       @first = false
     else
+      byebug
       return unless @res && row[@res]
     
       Connector.find_or_create_by(
@@ -120,8 +121,9 @@ class ClientsController < ApplicationController
           make_trx(row)
         end 
       end
-      @first = true   
     end  
+    
+    @first = true   
     
     unless client.attr_url.empty?   
       begin
@@ -130,7 +132,7 @@ class ClientsController < ApplicationController
           make_attr(row)
         end   
       rescue
-        file = client.trx_url
+        file = client.attr_url
         CSV.new(open(file)).each do |row|
           make_attr(row)
         end 
