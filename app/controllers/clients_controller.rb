@@ -65,7 +65,6 @@ class ClientsController < ApplicationController
       @par = row.index('parent_attribute_transaction_id')
       @first = false
     else
-      byebug
       return unless @res && row[@res]
     
       Connector.find_or_create_by(
