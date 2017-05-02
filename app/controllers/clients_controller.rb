@@ -88,10 +88,6 @@ class ClientsController < ApplicationController
   end
   
   def destroy
-    respond_to do |format|
-      format.html { redirect_to '/', notice: 'Destroying Client' }
-      format.json { head :no_content }
-    end
     c = Client.find(params['id'])
     c.transactions.destroy_all
     c.connectors.destroy_all
@@ -99,6 +95,10 @@ class ClientsController < ApplicationController
     c.bins.destroy_all
     c.factors.destroy_all
     c.destroy
+    respond_to do |format|
+      format.html { redirect_to '/', notice: 'Destroying Client' }
+      format.json { head :no_content }
+    end
   end
   
   def add_trx
