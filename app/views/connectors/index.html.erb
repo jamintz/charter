@@ -1,4 +1,19 @@
 <% @connectors.distinct(:name).pluck(:name).sort.each do |name| %>
+<h3><%="#{name.capitalize} "%>Connector Usage by Month</h3>
+<%= line_chart @connectors.where(name:name).group_by_month(:time).count %>
+<h3><%="#{name.capitalize} "%>Connector Usage by Week</h3>
+<%= line_chart @connectors.where(name:name).group_by_week(:time).count %>
+<h3><%="#{name.capitalize} "%>Connector Usage by Day</h3>
+<%= line_chart @connectors.where(name:name).group_by_day(:time).count %>
+<h3><%="#{name.capitalize} "%>Connector Usage by Hour of Day</h3>
+<%= line_chart @connectors.where(name:name).group_by_hour_of_day(:time).count %>
+<h3><%="#{name.capitalize} "%>Connector Usage by Day of Week</h3>
+<%= line_chart @connectors.where(name:name).group_by_day_of_week(:time).count %>
+<h3><%="#{name.capitalize} "%>Connector Usage by Day of Month</h3>
+<%= line_chart @connectors.where(name:name).group_by_day_of_month(:time).count %>
+<% end %>
+
+<% @connectors.distinct(:name).pluck(:name).sort.each do |name| %>
 <h3><%="#{name.capitalize} "%>Connector Response Time by Month</h3>
 <%= line_chart @connectors.where(name:name).group_by_month(:time).average(:exec_time) %>
 <h3><%="#{name.capitalize} "%>Connector Response Time by Week</h3>
