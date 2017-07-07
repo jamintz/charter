@@ -147,12 +147,12 @@ class ClientsController < ApplicationController
         end   
       rescue
         file = client.attr_url
-        CSV.new(open(file)).each do |row|
+        CSV.read(open(file)).each do |row|
           make_attr(row)
         end 
       end
     
-      Attr.distinct([:name,:connector]).pluck(:name,:connector).each do |name,connector|
+      Attr.where(client_id:@cid).distinct([:name,:connector]).pluck(:name,:connector).each do |name,connector|
         ats = Attr.where(name:name,connector:connector)
         sel = ats.order("RANDOM()").limit(100000)
         res = sel.map(&:result)
